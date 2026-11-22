@@ -1,5 +1,6 @@
--- Align the 24 B1 lesson titles with the uploaded Menschen B1 table of contents.
--- Run once in Supabase SQL Editor after the initial schema and lesson seed.
+-- Deutschraum original B1 lesson titles and summaries.
+-- Run in Supabase SQL Editor after schema.sql and seed-lessons.sql.
+-- The lesson names and descriptions below are independently written for Deutschraum.
 update public.lessons l
 set title = v.title,
     summary = v.summary,
@@ -7,30 +8,30 @@ set title = v.title,
     is_published = true
 from public.courses c
 cross join (values
-  (5, 'Freundschaft', 'Ihr seid einfach die Besten!'),
-  (6, 'Beruf und Arbeit', 'Er erledigte seine Aufgaben zuverlässig.'),
-  (7, 'Wohnen', 'Mein Beruf ist meine Leidenschaft.'),
-  (8, 'Kundenservice', 'Obwohl ich Ihnen das erklärt habe, ...'),
-  (9, 'Zukunft', 'Bald wird in fast jedem Haushalt ein PC stehen.'),
-  (10, 'Einladungen', 'Fühlen Sie sich wie zu Hause.'),
-  (11, 'Beratung', 'Kann ich Ihnen helfen?'),
-  (12, 'Berufsfindung', 'Während andere lange nachdenken, ...'),
-  (13, 'Gesundheit', 'Sport trägt zu einem größeren Wohlbefinden bei.'),
-  (14, 'Verpasste Gelegenheiten', 'Hätte ich das bloß anders gemacht!'),
-  (15, 'Glücksmomente', 'Nachdem wir jahrelang Pech gehabt hatten, ...'),
-  (16, 'Feiern im Betrieb', 'Ausflug des Jahres'),
-  (17, 'Sprache', 'Aus diesem Grund gab es ein Missverständnis.'),
-  (18, 'Weiterbildung', 'Die Teilnahme ist auf eigene Gefahr.'),
-  (19, 'Bewerbungen', 'Schön, dass Sie da sind.'),
-  (20, 'Jugend und Erinnerungen', 'Wir brauchten uns um nichts zu kümmern.'),
-  (21, 'Biografien', 'Guck mal! Das ist schön!'),
-  (22, 'Politik und Gesellschaft', 'Davon halte ich nicht viel.'),
-  (23, 'Tourismus', 'Je älter ich wurde, desto ...'),
-  (24, 'Regeln', 'Die anderen werden es dir danken!'),
-  (25, 'Konzerte und Veranstaltungen', 'Vorher muss natürlich fleißig geübt werden.'),
-  (26, 'Geschichte', 'In der BRD wurde die Demokratie eingeführt.'),
-  (27, 'Umwelt und Klima', 'Fahrradfahren ist in.'),
-  (28, 'Zukunftsvisionen', 'Das löst mehrere Probleme auf einmal.')
+  (5, 'Connecting with People', 'Build friendships, describe relationships and handle everyday social situations.'),
+  (6, 'Working Together', 'Talk about responsibilities, teamwork, routines and workplace experiences.'),
+  (7, 'Finding a Place to Live', 'Describe homes, compare living arrangements and discuss housing needs.'),
+  (8, 'Helping Customers', 'Handle questions, complaints and service situations politely.'),
+  (9, 'Technology in Everyday Life', 'Discuss digital habits, future technology and its impact on daily routines.'),
+  (10, 'Welcoming Guests', 'Invite people, respond to invitations and make guests feel comfortable.'),
+  (11, 'Giving Advice and Support', 'Ask for help, offer suggestions and respond tactfully.'),
+  (12, 'Choosing a Career Path', 'Talk about strengths, career choices and professional goals.'),
+  (13, 'Healthy Habits', 'Describe well-being, exercise and ways to maintain a healthy lifestyle.'),
+  (14, 'Learning from the Past', 'Talk about missed chances, regrets and alternative past situations.'),
+  (15, 'Positive Turning Points', 'Narrate fortunate events, unexpected changes and personal experiences.'),
+  (16, 'Events at Work', 'Plan team activities, workplace celebrations and shared events.'),
+  (17, 'When Communication Goes Wrong', 'Explain misunderstandings and clarify what you meant.'),
+  (18, 'Learning Throughout Life', 'Discuss courses, qualifications, training and learning opportunities.'),
+  (19, 'Applying for Opportunities', 'Present your experience and communicate confidently in application situations.'),
+  (20, 'Growing Up and Looking Back', 'Describe childhood routines, memories and changes over time.'),
+  (21, 'Stories Behind People', 'Talk about life stories, personal milestones and memorable experiences.'),
+  (22, 'Taking Part in Society', 'Express opinions, agree and disagree respectfully about social issues.'),
+  (23, 'Travel Experiences', 'Describe journeys, compare destinations and discuss travel preferences.'),
+  (24, 'Rules and Responsibilities', 'Explain rules, consequences, expectations and shared responsibilities.'),
+  (25, 'Enjoying Live Events', 'Talk about concerts, performances, preparation and cultural activities.'),
+  (26, 'How Society Has Changed', 'Describe historical developments and discuss their effects on everyday life.'),
+  (27, 'Protecting Our Environment', 'Discuss climate, sustainable choices and practical environmental action.'),
+  (28, 'Imagining Better Futures', 'Suggest solutions, evaluate possibilities and discuss future scenarios.')
 ) as v(sequence_no, title, summary)
 where l.course_id = c.id
   and c.slug = 'a2-to-b1-telc'
