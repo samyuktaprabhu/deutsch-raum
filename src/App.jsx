@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
 
 function AuthScreen() {
@@ -130,25 +130,83 @@ function LessonWorkspace({ lesson, onBack, onComplete, completed }) {
   function translationButton(key, text) {
     return <div className="translation-control"><button type="button" className="text-button" onClick={()=>setShowEnglish(old=>({...old,[key]:!old[key]}))}>{showEnglish[key]?'Hide English translation':'Show English translation'}</button>{showEnglish[key]&&<p className="translation-text">{text}</p>}</div>
   }
-  function speakFrom(index) {
-    if (!window.speechSynthesis) return
-    window.speechSynthesis.cancel()
-    const utterance = new SpeechSynthesisUtterance(listening[index])
-    utterance.lang = 'de-DE'; utterance.rate = 0.88
-    utterance.onend = () => {
-      if (index < listening.length - 1) speakFrom(index + 1)
-      else setAudioState('stopped')
+  const audioRun = useRef(0)
+  const audioSupported = typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window
+  const [audioMessage, setAudioMessage] = useState('')
+
+  function speakSentence(index, runId) {
+    if (!audioSupported || runId !== audioRun.current) return
+    if (index >= listening.length) {
+      setAudioState('stopped')
+      setAudioMessage('Playback finished.')
+      return
     }
-    utterance.onerror = () => setAudioState('stopped')
     setSentenceIndex(index)
-    setAudioState('playing')
+    const utterance = new SpeechSynthesisUtterance(listening[index])
+    utterance.lang = 'de-DE'
+    utterance.rate = 0.88
+    const germanVoice = window.speechSynthesis.getVoices().find(voice => voice.lang?.toLowerCase().startsWith('de'))
+    if (germanVoice) utterance.voice = germanVoice
+    utterance.onstart = () => {
+      if (runId === audioRun.current) {
+        setAudioState('playing')
+        setAudioMessage(germanVoice ? 'German voice: ' + germanVoice.name : 'Using your browser’s default German voice.')
+      }
+    }
+    utterance.onend = () => {
+      if (runId === audioRun.current) speakSentence(index + 1, runId)
+    }
+    utterance.onerror = event => {
+      if (runId !== audioRun.current || event.error === 'canceled' || event.error === 'interrupted') return
+      setAudioState('stopped')
+      setAudioMessage('Audio could not be played. Check your browser’s sound and German voice settings, then try again.')
+    }
     window.speechSynthesis.speak(utterance)
   }
-  function pauseAudio() { if (window.speechSynthesis?.speaking) { window.speechSynthesis.pause(); setAudioState('paused') } }
-  function resumeAudio() { if (window.speechSynthesis?.paused) { window.speechSynthesis.resume(); setAudioState('playing') } }
-  function stopAudio() { window.speechSynthesis?.cancel(); setAudioState('stopped') }
-  function seekAudio(value) { const index=Number(value); speakFrom(index) }
-  useEffect(()=>()=>window.speechSynthesis?.cancel(),[])
+
+  function speakFrom(index) {
+    if (!audioSupported) {
+      setAudioMessage('Your browser does not support speech playback. Try the latest Chrome, Edge or Safari.')
+      return
+    }
+    if (index < 0 || index >= listening.length) return
+    audioRun.current += 1
+    const runId = audioRun.current
+    window.speechSynthesis.cancel()
+    setAudioMessage('Preparing German audio…')
+    setAudioState('playing')
+    speakSentence(index, runId)
+  }
+
+  function pauseAudio() {
+    if (audioSupported && window.speechSynthesis.speaking) {
+      window.speechSynthesis.pause()
+      setAudioState('paused')
+    }
+  }
+
+  function resumeAudio() {
+    if (audioSupported && window.speechSynthesis.paused) {
+      window.speechSynthesis.resume()
+      setAudioState('playing')
+    }
+  }
+
+  function stopAudio() {
+    audioRun.current += 1
+    if (audioSupported) window.speechSynthesis.cancel()
+    setAudioState('stopped')
+    setAudioMessage('Playback stopped.')
+  }
+
+  function seekAudio(value) {
+    speakFrom(Number(value))
+  }
+
+  useEffect(() => () => {
+    audioRun.current += 1
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel()
+  }, [])
   const qs = sets[tab] || []
   const score = qs.filter((q,i)=>answers[tab+i]===String(q.a)).length
   const done = qs.every((q,i)=>answers[tab+i]!==undefined)
