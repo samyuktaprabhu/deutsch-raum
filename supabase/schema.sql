@@ -129,3 +129,11 @@ values (
   true
 )
 on conflict (slug) do nothing;
+
+
+-- Explicit Data API privileges; RLS policies above still constrain each row.
+grant select, update on public.profiles to authenticated;
+grant select on public.courses to authenticated;
+grant select on public.lessons to authenticated;
+grant select, insert on public.enrollments to authenticated;
+grant select, insert, update on public.lesson_progress to authenticated;
