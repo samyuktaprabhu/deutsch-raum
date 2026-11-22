@@ -57,6 +57,50 @@ function AuthScreen() {
   </main>
 }
 
+function LessonWorkspace({ lesson, onBack, onComplete, completed }) {
+  const [tab, setTab] = useState('Listening')
+  const [answers, setAnswers] = useState({})
+  const [draft, setDraft] = useState('')
+  const [notes, setNotes] = useState('')
+  const [checked, setChecked] = useState(false)
+  const [transcript, setTranscript] = useState(false)
+  const sections = ['Listening','Reading','Writing','Speaking','Grammar & vocabulary']
+  const listening = 'Hallo, ich bin neu in der Stadt und kenne hier noch nicht viele Leute. Am Wochenende möchte ich gern etwas unternehmen. Hast du einen Tipp? — Ja, wir treffen uns am Samstag mit Freunden im Park. Wenn du möchtest, kannst du mitkommen. — Das klingt toll! Soll ich etwas mitbringen? — Vielleicht einen kleinen Kuchen. Wir machen ein Picknick.'
+  const reading = 'Als ich vor einem Jahr nach Freiburg gezogen bin, kannte ich dort niemanden. Am Anfang war es nicht leicht, neue Kontakte zu knüpfen. Deshalb habe ich mich in einem Sportverein angemeldet. Schon nach wenigen Wochen kannte ich viele Menschen. Besonders schön finde ich, dass wir nicht nur zusammen trainieren, sondern auch am Wochenende etwas unternehmen. Eine gute Freundschaft braucht meiner Meinung nach Zeit und gegenseitiges Vertrauen.'
+  const sets = {
+    Listening: [{q:'What does the new person want to do?',o:['Stay at home','Do something with others','Go shopping'],a:1,e:'They say: Am Wochenende möchte ich gern etwas unternehmen.'},{q:'Where will they meet?',o:['At a café','In the park','At the station'],a:1,e:'They meet im Park.'},{q:'What might the guest bring?',o:['A cake','Books','A football'],a:0,e:'The suggestion is einen kleinen Kuchen.'}],
+    Reading: [{q:'Why did the writer join a sports club?',o:['To find a job','To meet people','To study grammar'],a:1,e:'The writer wanted to make new contacts.'},{q:'What do members do besides training?',o:['Meet at weekends','Travel every day','Study together'],a:0,e:'They also do activities at weekends.'},{q:'What does friendship need?',o:['Money','Time and trust','The same hobbies'],a:1,e:'The text says time and gegenseitiges Vertrauen.'}],
+    'Grammar & vocabulary': [{q:'Ich freue mich ___ das Treffen.',o:['auf','an','mit'],a:0,e:'sich freuen auf + Akkusativ.'},{q:'Choose the correct word order.',o:['Weil ich bin neu …','Weil ich neu bin …','Weil neu ich bin …'],a:1,e:'The conjugated verb goes to the end of a weil-clause.'},{q:'Which phrase introduces an opinion?',o:['Meiner Meinung nach …','Seit zwei Jahre …','Zum Beispiel gestern …'],a:0,e:'Meiner Meinung nach is a useful B1 opinion phrase.'},{q:'Wir treffen ___ am Samstag.',o:['uns','sich','euch'],a:0,e:'The reflexive pronoun for wir is uns.'}]
+  }
+  function play() {
+    if (!window.speechSynthesis) return
+    window.speechSynthesis.cancel()
+    const u = new SpeechSynthesisUtterance(listening); u.lang = 'de-DE'; u.rate = 0.88
+    window.speechSynthesis.speak(u)
+  }
+  const qs = sets[tab] || []
+  const score = qs.filter((q,i)=>answers[tab+i]===String(q.a)).length
+  const done = qs.every((q,i)=>answers[tab+i]!==undefined)
+  return <div className="app-shell lesson-page">
+    <header className="topbar"><a className="brand" href="/">deutsch<span>raum</span></a><span>{lesson.level} · Session {lesson.sequence_no}</span></header>
+    <main className="dashboard lesson-page-content">
+      <button className="text-button back-link" onClick={onBack}>← Back to course roadmap</button>
+      <section className="lesson-hero"><p className="eyebrow">DEUTSCHRAUM · {lesson.level} · SESSION {lesson.sequence_no}</p><h1>{lesson.sequence_no===1?'Sentence structure':lesson.title}</h1><p>{lesson.summary}</p><div className="lesson-meta"><span>90-minute learning plan</span><span>4 language skills + language focus</span></div></section>
+      <nav className="skill-nav">{sections.map(x=><button key={x} className={tab===x?'active':''} onClick={()=>{setTab(x);setChecked(false)}}>{x}</button>)}</nav>
+      <section className="skill-card"><div className="skill-heading"><div><p className="eyebrow">YOUR PRACTICE</p><h2>{tab}</h2></div><span className="time-chip">{tab==='Writing'?'25 min':tab==='Speaking'?'20 min':'15 min'}</span></div>
+        {tab==='Listening' && <><p>Listen once for the main idea, then again for details. This original dialogue practises invitations and making social plans.</p><div className="audio-card"><b>German conversation · Listen carefully</b><button className="primary" onClick={play}>▶ Play German audio</button><small>Audio is spoken by your browser's German text-to-speech voice.</small></div><button className="text-button" onClick={()=>setTranscript(!transcript)}>{transcript?'Hide transcript':'Reveal transcript after listening'}</button>{transcript&&<blockquote className="transcript">{listening}</blockquote>}</>}
+        {tab==='Reading' && <><p>Read the text once for the main idea. Read again and look for reasons and details.</p><article className="reading-passage">{reading}</article><small>Original Deutschraum reading text · B1</small></>}
+        {tab==='Writing' && <><div className="task-box"><b>Writing task · 80–100 words</b><p>You have recently moved to a new city. Write an email to a colleague. Explain how you are settling in, describe one way you are meeting new people, and suggest doing something together.</p></div><div className="phrase-list"><b>Useful expressions</b><p>Seit Kurzem wohne ich … · Am Anfang war es … · Inzwischen habe ich … · Hättest du Lust, …? · Ich freue mich auf deine Antwort.</p></div><label className="answer-label">Your email<textarea rows={9} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Liebe/r …"/></label><p className="word-count">{draft.trim()?draft.trim().split(/\s+/).length:0} words · Target: 80–100</p><button className="check-button" onClick={()=>setChecked(true)} disabled={!draft.trim()}>Show self-review checklist</button>{checked&&<div className="feedback-panel"><b>Review your writing</b><ul><li>Did you answer all three parts?</li><li>Did you use a greeting and polite ending?</li><li>Did you connect ideas with weil, deshalb, aber or außerdem?</li><li>Did you check verb position and noun capitalisation?</li></ul><p>Automated correction is not connected yet; use this checklist to review your draft.</p></div>}</>}
+        {tab==='Speaking' && <><p>Speak for 1–2 minutes per prompt. Give reasons and examples, not just short answers.</p><div className="task-box"><ol><li>Wie lernt man in einer neuen Stadt am besten Leute kennen?</li><li>Was ist dir bei einer Freundschaft besonders wichtig?</li><li>Erzähl von einer Situation, in der du jemanden neu kennengelernt hast.</li></ol></div><div className="phrase-list"><b>Useful speaking phrases</b><p>Meiner Meinung nach … · Ein gutes Beispiel dafür ist … · Einerseits …, andererseits … · Ich habe die Erfahrung gemacht, dass …</p></div><label className="answer-label">Speaking notes or speech-to-text<textarea rows={6} value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Write or dictate what you said …"/></label><small>Use your device's dictation to capture your spoken response.</small></>}
+        {qs.map((q,i)=><div className="question-card" key={q.q}><b>{i+1}. {q.q}</b><div className="quiz-options">{q.o.map((o,j)=><button key={o} className={answers[tab+i]===String(j)?'selected':''} onClick={()=>setAnswers(old=>({...old,[tab+i]:String(j)}))}>{String.fromCharCode(65+j)}. {o}</button>)}</div>{checked&&<p className={answers[tab+i]===String(q.a)?'feedback-correct':'feedback-wrong'}>{answers[tab+i]===String(q.a)?'Correct. ':'Review: '}{q.e}</p>}</div>)}
+        {qs.length>0&&<div className="skill-footer"><span>{done?score+' / '+qs.length+' correct':'Answer all questions to check your result'}</span><button className="primary" disabled={!done} onClick={()=>setChecked(true)}>Check answers</button></div>}
+      </section>
+      <section className="lesson-completion"><div><b>Lesson progress</b><p>Complete all four skills and the language focus, then mark this session complete.</p></div><button className="primary" onClick={onComplete}>{completed?'Mark in progress':'Mark lesson complete'}</button></section>
+      <p className="footer">Original Deutschraum learning material · Independent learning companion.</p>
+    </main>
+  </div>
+}
+
 function Dashboard({ session }) {
   const [profile, setProfile] = useState(null)
   const [course, setCourse] = useState(null)
@@ -142,15 +186,7 @@ function Dashboard({ session }) {
   async function signOut() { await supabase.auth.signOut() }
   const visible = lessons.filter(l => filter==='all' || (filter==='completed' ? completedIds.has(l.id) : l.level===filter))
 
-  if (openLesson) return <div className="app-shell lesson-page">
-    <header className="topbar"><a className="brand" href="/">deutsch<span>raum</span></a><div className="user-area"><span>{profile?.display_name || user.email}</span><button className="text-button" onClick={signOut}>Sign out</button></div></header>
-    <main className="dashboard lesson-page-content">
-      <button className="text-button back-link" onClick={closeLessonPage}>← Back to course roadmap</button>
-      <section className="lesson-detail standalone-lesson"><p className="eyebrow">DEUTSCHRAUM · {openLesson.level} · SESSION {openLesson.sequence_no}</p><h1>{openLesson.sequence_no===1?'Sentence Structure':openLesson.title}</h1>
-        {openLesson.sequence_no===1 ? <><h3>Learning goals</h3><ul><li>Recognise the finite verb in a German main clause.</li><li>Keep the conjugated verb in position 2 in a statement.</li><li>Use the time–manner–place order as a helpful starting point.</li></ul><h3>1. The verb is in position 2</h3><p>In a normal German statement, the conjugated verb occupies the second sentence element. The first element can be the subject, a time phrase or another piece of information.</p><div className="example-box"><b>Ich lerne heute Deutsch.</b><span>I am learning German today.</span><b>Heute lerne ich Deutsch.</b><span>Today I am learning German.</span><b>Am Abend lernt Rohan Deutsch.</b><span>In the evening, Rohan studies German.</span></div><p>Notice: when <i>Heute</i> or <i>Am Abend</i> comes first, the subject moves after the verb. The verb stays in position 2.</p><h3>2. Try it</h3><p>Choose the correct sentence for “Today I work at home.”</p><div className="quiz-options">{['Heute ich arbeite zu Hause.','Heute arbeite ich zu Hause.','Heute zu Hause ich arbeite.'].map(option=><button key={option} className={quizChoice===option?'selected':''} onClick={()=>setQuizChoice(option)}>{option}</button>)}</div>{quizChoice && <p className={quizChoice==='Heute arbeite ich zu Hause.'?'feedback-correct':'feedback-wrong'}>{quizChoice==='Heute arbeite ich zu Hause.'?'Correct! The conjugated verb arbeite is in position 2.':'Not quite. Remember: the conjugated verb must be the second sentence element.'}</p>}<h3>3. Your turn</h3><p>Write three sentences: one beginning with <i>Ich</i>, one with <i>Heute</i>, and one with <i>Am Wochenende</i>. Keep the conjugated verb in position 2.</p><div className="callout">This is the first original Deutschraum lesson prototype. More examples, practice types and the remaining lessons will be added progressively.</div></> : <><p>{openLesson.summary}</p><p>Full teaching content for this session is being developed. We'll add original explanations, examples, vocabulary and interactive practice before treating it as a complete lesson.</p></>}
-      </section>
-    </main>
-  </div>
+  if (openLesson) return <LessonWorkspace lesson={openLesson} onBack={closeLessonPage} onComplete={()=>toggle(openLesson)} completed={completedIds.has(openLesson.id)} />
 
   return <div className="app-shell">
     <header className="topbar"><a className="brand" href="/">deutsch<span>raum</span></a><div className="user-area"><span>{profile?.display_name || user.email}</span><button className="text-button" onClick={signOut}>Sign out</button></div></header>
