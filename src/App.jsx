@@ -4,7 +4,7 @@ import { isSupabaseConfigured, supabase } from './lib/supabase'
 function AuthScreen() {
   const [mode, setMode] = useState('signin')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [password, setPasswort] = useState('')
   const [name, setName] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
@@ -18,41 +18,41 @@ function AuthScreen() {
           email, password, options: { data: { display_name: name }, emailRedirectTo: window.location.origin }
         })
         if (error) throw error
-        setMessage(data.session ? 'Account created. Welcome to Deutschraum!' : 'Check your email to confirm your account, then sign in.')
+        setMessage(data.session ? 'Dein Konto wurde erstellt. Willkommen bei Deutschraum!' : 'Bitte bestätige dein Konto über die E-Mail und melde dich danach an.')
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        const { error } = await supabase.auth.signInWithPasswort({ email, password })
         if (error) throw error
       }
     } catch (error) { setMessage(error.message) }
     finally { setBusy(false) }
   }
 
-  async function resetPassword() {
-    if (!email) { setMessage('Enter your email address first.'); return }
+  async function resetPasswort() {
+    if (!email) { setMessage('Gib zuerst deine E-Mail-Adresse ein.'); return }
     setBusy(true)
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswortForEmail(email, {
       redirectTo: window.location.origin
     })
-    setMessage(error ? error.message : 'If the email is registered, a password reset link will arrive shortly.')
+    setMessage(error ? error.message : 'Falls diese E-Mail-Adresse registriert ist, erhältst du in Kürze einen Link zum Zurücksetzen deines Passworts.')
     setBusy(false)
   }
 
   return <main className="auth-wrap">
     <section className="auth-card">
       <a className="brand" href="/">deutsch<span>raum</span></a>
-      <p className="eyebrow">YOUR GERMAN CLASSROOM</p>
-      <h1>{mode === 'signup' ? 'Create your account.' : 'Welcome back.'}</h1>
-      <p className="muted">A little German, consistently. Your learning progress stays with your account.</p>
+      <p className="eyebrow">DEIN DEUTSCHKURS</p>
+      <h1>{mode === 'signup' ? 'Konto erstellen.' : 'Willkommen zurück.'}</h1>
+      <p className="muted">Lerne regelmäßig Deutsch. Dein Lernfortschritt wird in deinem Konto gespeichert.</p>
       <form onSubmit={submit} className="auth-form">
-        {mode === 'signup' && <label>Your name<input value={name} onChange={e=>setName(e.target.value)} required autoComplete="name" /></label>}
-        <label>Email address<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required autoComplete="email" /></label>
-        <label>Password<input type="password" value={password} onChange={e=>setPassword(e.target.value)} required minLength={8} autoComplete={mode==='signup'?'new-password':'current-password'} /></label>
-        <button className="primary" disabled={busy}>{busy ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}</button>
+        {mode === 'signup' && <label>Dein Name<input value={name} onChange={e=>setName(e.target.value)} required autoComplete="name" /></label>}
+        <label>E-Mail-Adresse<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required autoComplete="email" /></label>
+        <label>Passwort<input type="password" value={password} onChange={e=>setPasswort(e.target.value)} required minLength={8} autoComplete={mode==='signup'?'new-password':'current-password'} /></label>
+        <button className="primary" disabled={busy}>{busy ? 'Einen Moment bitte …' : mode === 'signup' ? 'Konto erstellen' : 'Anmelden'}</button>
       </form>
-      {mode === 'signin' && <button className="text-button" onClick={resetPassword} disabled={busy}>Forgot password?</button>}
-      <p className="switch">{mode === 'signup' ? 'Already registered?' : 'New to Deutschraum?'} <button className="text-button" onClick={()=>{setMode(mode==='signup'?'signin':'signup');setMessage('')}}>{mode==='signup'?'Sign in':'Create an account'}</button></p>
+      {mode === 'signin' && <button className="text-button" onClick={resetPasswort} disabled={busy}>Passwort vergessen?</button>}
+      <p className="switch">{mode === 'signup' ? 'Du hast bereits ein Konto?' : 'Neu bei Deutschraum?'} <button className="text-button" onClick={()=>{setMode(mode==='signup'?'signin':'signup');setMessage('')}}>{mode==='signup'?'Anmelden':'Create an account'}</button></p>
       {message && <p className="notice" role="status">{message}</p>}
-      <p className="fineprint">By continuing, you agree to use Deutschraum as an independent learning companion.</p>
+      <p className="fineprint">Mit deiner Anmeldung nutzt du Deutschraum als unabhängige Lernplattform.</p>
     </section>
   </main>
 }
@@ -136,7 +136,7 @@ function LessonWorkspace({ lesson, onBack, onComplete, completed }) {
       <nav className="skill-nav">{sections.map(x=><button key={x} className={tab===x?'active':''} onClick={()=>{setTab(x);setChecked(false)}}>{x}</button>)}</nav>
       <section className="skill-card"><div className="skill-heading"><div><p className="eyebrow">DEINE ÜBUNGEN</p><h2>{tab}</h2></div><span className="time-chip">{tab==='Schreiben'?'25 Min.':tab==='Sprechen'?'20 Min.':'15 Min.'}</span></div>
         {tab==='Hören' && <><p>{english.Hören.intro}</p>{translationButton('listen-intro',english.Hören.task)}<div className="audio-card"><b>{english.Hören.audio}</b><div className="audio-controls"><button className="primary" onClick={()=>speakFrom(0)} disabled={audioState==='playing'}>▶ {english.Hören.play}</button><button className="check-button" onClick={pauseAudio} disabled={audioState!=='playing'}>Ⅱ {english.Hören.pause}</button><button className="check-button" onClick={resumeAudio} disabled={audioState!=='paused'}>↻ {english.Hören.resume}</button><button className="check-button" onClick={stopAudio}>■ {english.Hören.stop}</button></div><label className="seek-control">Satz auswählen und abspielen <input type="range" min="0" max={listening.length-1} value={sentenceIndex} onChange={e=>seekAudio(e.target.value)} /><small>Satz {sentenceIndex+1} von {listening.length} · Du kannst direkt zu einem Satz springen.</small></label><small>Die Wiedergabe nutzt die deutsche Sprachsynthese deines Browsers. Du kannst pausieren, fortsetzen, stoppen oder ab einem beliebigen Satz starten.</small></div><button className="text-button" onClick={()=>setTranscript(!transcript)}>{transcript?'Transkript ausblenden':'Transkript nach dem Hören anzeigen'}</button>{transcript&&<blockquote className="transcript">{listening.join(' ')}</blockquote>}</>}
-        {tab==='Lesen' && <><p>{english.Lesen.intro}</p>{translationButton('reading-intro',english.Lesen.task)}<article className="reading-passage">{reading}</article><small>Originaler Lesetext von Deutschraum · B1</small></>}
+        {tab==='Lesen' && <><p>{english.Lesen.intro}</p>{translationButton('reading-intro',english.Lesen.task)}<div className="reading-passage">{reading}</div>{translationButton('reading-passage', 'When I moved to Freiburg a year ago, I did not know anyone there. At first, it was not easy to make new contacts. So I joined a sports club. After just a few weeks, I knew many people. I especially like that we not only train together but also do things at weekends. In my opinion, a good friendship needs time and mutual trust.') }<small>Originaler Lesetext von Deutschraum · B1</small></>}
         {tab==='Schreiben' && <><div className="task-box"><b>Schreibaufgabe · 80–100 Wörter</b><p>Du bist vor Kurzem in eine neue Stadt gezogen. Schreibe eine E-Mail an eine Kollegin oder einen Kollegen. Berichte, wie du dich eingelebt hast. Beschreibe, wie du neue Menschen kennenlernst, und schlage ein gemeinsames Treffen vor. Schreibe 80–100 Wörter.</p>{translationButton('writing-task',english.Schreiben.task)}</div><div className="phrase-list"><b>Nützliche Redemittel</b><p>Seit Kurzem wohne ich … · Am Anfang war es … · Inzwischen habe ich … · Hättest du Lust, …? · Ich freue mich auf deine Antwort.</p></div><label className="answer-label">Deine E-Mail<textarea rows={9} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Liebe/r …"/></label><p className="word-count">{draft.trim()?draft.trim().split(/\s+/).length:0} Wörter · Ziel: 80–100</p><button className="check-button" onClick={()=>setChecked(true)} disabled={!draft.trim()}>Checkliste zur Selbstkontrolle anzeigen</button>{checked&&<div className="feedback-panel"><b>Überprüfe deinen Text</b><ul>{english.Schreiben.checklist.map(item=><li key={item}>{item}</li>)}</ul><p>Eine automatische Textkorrektur ist noch nicht verfügbar. Nutze diese Checkliste zur Überarbeitung.</p></div>}</>}
         {tab==='Sprechen' && <><p>{english.Sprechen.intro}</p>{translationButton('speaking-intro',english.Sprechen.task)}<div className="task-box"><ol><li>Wie lernt man in einer neuen Stadt am besten Leute kennen?</li><li>Was ist dir bei einer Freundschaft besonders wichtig?</li><li>Erzähl von einer Situation, in der du jemanden neu kennengelernt hast.</li></ol></div><div className="phrase-list"><b>Nützliche Redemittel</b><p>Meiner Meinung nach … · Ein gutes Beispiel dafür ist … · Einerseits …, andererseits … · Ich habe die Erfahrung gemacht, dass …</p></div><label className="answer-label">Notizen oder Spracheingabe<textarea rows={6} value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Schreibe oder diktiere deine Antwort …"/></label><small>Du kannst die Diktierfunktion deines Geräts verwenden, um deine Antwort festzuhalten.</small></>}
         {tab==='Grammatik & Wortschatz' && <p>{english[tab].intro}</p>}
@@ -237,19 +237,19 @@ function Dashboard({ session }) {
   if (openLesson) return <LessonWorkspace lesson={openLesson} onBack={closeLessonPage} onComplete={()=>toggle(openLesson)} completed={completedIds.has(openLesson.id)} />
 
   return <div className="app-shell">
-    <header className="topbar"><a className="brand" href="/">deutsch<span>raum</span></a><div className="user-area"><span>{profile?.display_name || user.email}</span><button className="text-button" onClick={signOut}>Sign out</button></div></header>
+    <header className="topbar"><a className="brand" href="/">deutsch<span>raum</span></a><div className="user-area"><span>{profile?.display_name || user.email}</span><button className="text-button" onClick={signOut}>Abmelden</button></div></header>
     <main className="dashboard">
-      <section className="welcome"><div><p className="eyebrow">DEIN LERNRAUM · YOUR LEARNING SPACE</p><h1>Make room for <em>German.</em></h1><p className="muted">Your path from A2 revision to B1 confidence and telc preparation.</p></div>
-        <div className="progress-card"><span className="eyebrow">COURSE PROGRESS</span><strong>{percent}%</strong><div className="progress-track"><i style={{width:percent+'%'}} /></div><small>{completedIds.size} of {lessons.length} lessons completed</small></div>
+      <section className="welcome"><div><p className="eyebrow">DEIN LERNRAUM · YOUR LEARNING SPACE</p><h1>Schaffe Platz für <em>Deutsch.</em></h1><p className="muted">Dein Weg von der A2-Wiederholung zu mehr Sicherheit auf B1-Niveau und zur telc-Prüfung.</p></div>
+        <div className="progress-card"><span className="eyebrow">KURSFORTSCHRITT</span><strong>{percent}%</strong><div className="progress-track"><i style={{width:percent+'%'}} /></div><small>{completedIds.size} von {lessons.length} Einheiten abgeschlossen</small></div>
       </section>
-      <section className="course-heading"><div><p className="eyebrow">YOUR COURSE</p><h2>{course?.title || 'A2 Refresh to B1 · telc Preparation'}</h2><p className="muted">Weekday evenings · 19:00–20:30 CET · Menschen B1</p></div></section>
+      <section className="course-heading"><div><p className="eyebrow">DEIN KURS</p><h2>{course?.title || 'A2 Refresh to B1 · telc Preparation'}</h2><p className="muted">Werktags abends · 19:00–20:30 Uhr · Menschen B1</p></div></section>
       {error && <p className="notice">{error}</p>}
-      {loading ? <p className="muted">Loading your classroom…</p> : lessons.length===0 ? <section className="empty-card"><h3>Your classroom is being prepared.</h3><p>The account and course database are connected. Lesson sessions will appear here once the course content has been added.</p></section> :
-        <section className="lesson-panel"><div className="panel-head"><h3>Course roadmap</h3><div className="filters">{['all','A2','B1','completed'].map(f=><button key={f} className={filter===f?'active':''} onClick={()=>setFilter(f)}>{f==='all'?'All':f==='completed'?'Completed':f}</button>)}</div></div>
-          {false && openLesson && <section className="lesson-detail"><button className="text-button" onClick={()=>setOpenLesson(null)}>← Back to roadmap</button><p className="eyebrow">A2 REFRESH · LESSON 1</p><h2>{openLesson.sequence_no===1?'Sentence Structure':openLesson.title}</h2>{openLesson.sequence_no===1 ? <><h3>Learning goals</h3><ul><li>Recognise the finite verb in a German main clause.</li><li>Keep the conjugated verb in position 2 in a statement.</li><li>Use the time–manner–place order as a helpful starting point.</li></ul><h3>1. The verb is in position 2</h3><p>In a normal German statement, the conjugated verb occupies the second sentence element. The first element can be the subject, a time phrase or another piece of information.</p><div className="example-box"><b>Ich lerne heute Deutsch.</b><span>I am learning German today.</span><b>Heute lerne ich Deutsch.</b><span>Today I am learning German.</span><b>Am Abend lernt Rohan Deutsch.</b><span>In the evening, Rohan studies German.</span></div><p>Notice: when <i>Heute</i> or <i>Am Abend</i> comes first, the subject moves after the verb. The verb stays in position 2.</p><h3>2. Try it</h3><p>Choose the correct sentence for “Today I work at home.”</p><div className="quiz-options">{['Heute ich arbeite zu Hause.','Heute arbeite ich zu Hause.','Heute zu Hause ich arbeite.'].map(option=><button key={option} className={quizChoice===option?'selected':''} onClick={()=>setQuizChoice(option)}>{option}</button>)}</div>{quizChoice && <p className={quizChoice==='Heute arbeite ich zu Hause.'?'feedback-correct':'feedback-wrong'}>{quizChoice==='Heute arbeite ich zu Hause.'?'Correct! The conjugated verb arbeite is in position 2.':'Not quite. Remember: the conjugated verb must be the second sentence element.'}</p>}<h3>3. Your turn</h3><p>Write three sentences: one beginning with <i>Ich</i>, one with <i>Heute</i>, and one with <i>Am Wochenende</i>. Keep the conjugated verb in position 2.</p><div className="callout">This is the first original Deutschraum lesson prototype. More examples, practice types and the remaining lessons will be added progressively.</div></> : <><p>{openLesson.summary}</p><p>Full teaching content for this session is being developed. We'll add original explanations, examples, vocabulary and interactive practice before treating it as a complete lesson.</p></>}</section>}
-                    {visible.map(lesson=><article className="lesson-row" key={lesson.id}><div className="lesson-date">{lesson.scheduled_date ? new Date(lesson.scheduled_date+'T12:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short'}) : '—'}</div><div className="lesson-copy"><b>{lesson.title}</b><p>{lesson.summary || lesson.level+' lesson'}</p><small>{lesson.level} · Session {lesson.sequence_no}</small><div className="lesson-actions"><button className="check-button" onClick={()=>openLessonPage(lesson)}>Open lesson</button><button className={completedIds.has(lesson.id)?'done-button':'check-button'} onClick={()=>toggle(lesson)}>{completedIds.has(lesson.id)?'Completed ✓':'Mark done'}</button></div></div></article>)}
+      {loading ? <p className="muted">Dein Kursraum wird geladen …</p> : lessons.length===0 ? <section className="empty-card"><h3>Dein Kursraum wird vorbereitet.</h3><p>Dein Konto und die Kursdatenbank sind verbunden. Die Einheiten erscheinen hier, sobald die Kursinhalte bereitstehen.</p></section> :
+        <section className="lesson-panel"><div className="panel-head"><h3>Kursplan</h3><div className="filters">{['all','A2','B1','completed'].map(f=><button key={f} className={filter===f?'active':''} onClick={()=>setFilter(f)}>{f==='all'?'Allee':f==='completed'?'Abgeschlossen':f}</button>)}</div></div>
+          {false && openLesson && <section className="lesson-detail"><button className="text-button" onClick={()=>setOpenLesson(null)}>← Back to roadmap</button><p className="eyebrow">A2 REFRESH · LESSON 1</p><h2>{openLesson.sequence_no===1?'Sentence Structure':openLesson.title}</h2>{openLesson.sequence_no===1 ? <><h3>Learning goals</h3><ul><li>Recognise the finite verb in a German main clause.</li><li>Keep the conjugated verb in position 2 in a statement.</li><li>Use the time–manner–place order as a helpful starting point.</li></ul><h3>1. The verb is in position 2</h3><p>In a normal German statement, the conjugated verb occupies the second sentence element. The first element can be the subject, a time phrase or another piece von information.</p><div className="example-box"><b>Ich lerne heute Deutsch.</b><span>I am learning German today.</span><b>Heute lerne ich Deutsch.</b><span>Today I am learning German.</span><b>Am Abend lernt Rohan Deutsch.</b><span>In the evening, Rohan studies German.</span></div><p>Notice: when <i>Heute</i> or <i>Am Abend</i> comes first, the subject moves after the verb. The verb stays in position 2.</p><h3>2. Try it</h3><p>Choose the correct sentence for “Today I work at home.”</p><div className="quiz-options">{['Heute ich arbeite zu Hause.','Heute arbeite ich zu Hause.','Heute zu Hause ich arbeite.'].map(option=><button key={option} className={quizChoice===option?'selected':''} onClick={()=>setQuizChoice(option)}>{option}</button>)}</div>{quizChoice && <p className={quizChoice==='Heute arbeite ich zu Hause.'?'feedback-correct':'feedback-wrong'}>{quizChoice==='Heute arbeite ich zu Hause.'?'Correct! The conjugated verb arbeite is in position 2.':'Not quite. Remember: the conjugated verb must be the second sentence element.'}</p>}<h3>3. Your turn</h3><p>Write three sentences: one beginning with <i>Ich</i>, one with <i>Heute</i>, and one with <i>Am Wochenende</i>. Keep the conjugated verb in position 2.</p><div className="callout">This is the first original Deutschraum lesson prototype. More examples, practice types and the remaining lessons will be added progressively.</div></> : <><p>{openLesson.summary}</p><p>Full teaching content for this session is being developed. We'll add original explanations, examples, vocabulary and interactive practice before treating it as a complete lesson.</p></>}</section>}
+                    {visible.map(lesson=><article className="lesson-row" key={lesson.id}><div className="lesson-date">{lesson.scheduled_date ? new Date(lesson.scheduled_date+'T12:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'short'}) : '—'}</div><div className="lesson-copy"><b>{lesson.title}</b><p>{lesson.summary || lesson.level+' lesson'}</p><small>{lesson.level} · Session {lesson.sequence_no}</small><div className="lesson-actions"><button className="check-button" onClick={()=>openLessonPage(lesson)}>Einheit öffnen</button><button className={completedIds.has(lesson.id)?'done-button':'check-button'} onClick={()=>toggle(lesson)}>{completedIds.has(lesson.id)?'Abgeschlossen ✓':'Als erledigt markieren'}</button></div></div></article>)}
         </section>}
-      <footer className="footer">Deutschraum · Independent learning companion · Progress syncs to your account.</footer>
+      <footer className="footer">Deutschraum · Unabhängige Lernplattform · Dein Lernfortschritt wird gespeichert.</footer>
     </main>
   </div>
 }
