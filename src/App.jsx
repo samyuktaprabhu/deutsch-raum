@@ -27,15 +27,6 @@ function AuthScreen() {
     finally { setBusy(false) }
   }
 
-  async function google() {
-    setBusy(true); setMessage('')
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin }
-    })
-    if (error) { setMessage(error.message); setBusy(false) }
-  }
-
   async function resetPassword() {
     if (!email) { setMessage('Enter your email address first.'); return }
     setBusy(true)
@@ -52,8 +43,6 @@ function AuthScreen() {
       <p className="eyebrow">YOUR GERMAN CLASSROOM</p>
       <h1>{mode === 'signup' ? 'Create your account.' : 'Welcome back.'}</h1>
       <p className="muted">A little German, consistently. Your learning progress stays with your account.</p>
-      <button className="google-button" onClick={google} disabled={busy}>Continue with Google</button>
-      <div className="or"><span>or use email</span></div>
       <form onSubmit={submit} className="auth-form">
         {mode === 'signup' && <label>Your name<input value={name} onChange={e=>setName(e.target.value)} required autoComplete="name" /></label>}
         <label>Email address<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required autoComplete="email" /></label>
