@@ -15,7 +15,7 @@ function AuthScreen() {
     try {
       if (mode === 'signup') {
         const { data, error } = await supabase.auth.signUp({
-          email, password, options: { data: { display_name: name } }
+          email, password, options: { data: { display_name: name }, emailRedirectTo: window.location.origin }
         })
         if (error) throw error
         setMessage(data.session ? 'Account created. Welcome to Deutschraum!' : 'Check your email to confirm your account, then sign in.')
