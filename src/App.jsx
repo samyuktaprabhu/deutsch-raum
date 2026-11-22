@@ -97,11 +97,11 @@ function LessonWorkspace({ lesson, onBack, onComplete, completed }) {
     ]
   }
   const english = {
-    Hören: {intro:'Höre zuerst auf die Hauptaussage und danach noch einmal auf Einzelheiten. Der Dialog übt Einladungen und Verabredungen.',task:'Höre dir den Dialog an. Beantworte anschließend die Fragen.',audio:'German dialogue · Listen carefully',play:'Play',pause:'Pause',resume:'Resume',stop:'Stop',transcript:'Show transcript',hide:'Hide transcript'},
-    Lesen: {intro:'Lies den Text zuerst, um die Hauptaussage zu verstehen. Lies ihn danach noch einmal und achte auf Gründe und Einzelheiten.',task:'Lies den Text und beantworte anschließend die Fragen.'},
-    Schreiben: {task:'Du bist vor Kurzem in eine neue Stadt gezogen. Schreibe eine E-Mail an eine Kollegin oder einen Kollegen. Berichte, wie du dich eingelebt hast. Beschreibe, wie du neue Menschen kennenlernst, und schlage ein gemeinsames Treffen vor. Schreibe 80–100 Wörter.',label:'Your email',review:'Review your text',checklist:['Hast du alle drei Aufgabenpunkte beantwortet?','Hast du eine passende Anrede und einen höflichen Schluss verwendet?','Hast du deine Ideen mit weil, deshalb, aber oder außerdem verbunden?','Hast du die Verbposition und die Großschreibung der Nomen überprüft?']},
-    Sprechen: {intro:'Sprich 1–2 Minuten zu jeder Frage. Begründe deine Meinung und nenne Beispiele, statt nur kurz zu antworten.',task:'Answer the questions aloud.'},
-    'Grammatik & Wortschatz': {intro:'Wähle die richtige Antwort. Lies danach die Erklärung und versuche, einen eigenen Beispielsatz zu bilden.'}
+    Hören: {intro:'First, listen for the main idea. Then listen again for specific details. This dialogue practises invitations and making plans.',task:'Listen to the dialogue. Then answer the questions.',audio:'German dialogue · Listen carefully',play:'Play',pause:'Pause',resume:'Resume',stop:'Stop',transcript:'Show transcript',hide:'Hide transcript'},
+    Lesen: {intro:'Read the text once to understand the main idea. Then read it again and look for reasons and specific details.',task:'Read the text and then answer the questions.'},
+    Schreiben: {task:'You have recently moved to a new city. Write an email to a colleague. Describe how you have settled in, explain how you are meeting new people, and suggest meeting up. Write 80–100 words.',label:'Your email',review:'Review your text',checklist:['Have you addressed all three points in the task?','Have you used an appropriate greeting and a polite closing?','Have you connected your ideas with weil, deshalb, aber or außerdem?','Have you checked verb position and German noun capitalisation?']},
+    Sprechen: {intro:'Speak for 1–2 minutes on each question. Explain your opinion and give examples instead of giving only short answers.',task:'Answer the questions aloud.'},
+    'Grammatik & Wortschatz': {intro:'Choose the correct answer. Then read the explanation and try to create a sentence of your own.'}
   }
   const [showEnglish, setShowEnglish] = useState({})
   const questionEnglish = {
