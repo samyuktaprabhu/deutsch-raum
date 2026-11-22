@@ -2,19 +2,20 @@
 
 **Your personal German-learning classroom — from A2 refresh to B1 confidence.**
 
-Deutschraum is a React + Vite learning app with Supabase authentication and learner-specific progress tracking. The initial roadmap is designed around *Menschen B1* and telc B1 preparation.
+Deutschraum is a React + Vite learning app with Supabase authentication and learner-specific progress tracking. The classroom uses an English interface while German exercises and learning content remain in German, with optional English translations.
 
 ## Current features
 
 - Email/password registration, sign-in and password reset
-- Google sign-in button (requires Google OAuth provider setup in Supabase)
 - Supabase-backed learner profiles and enrollments
-- 32-session weekday roadmap: A2 refresh, 12 B1 chapter sessions and telc preparation
-- Per-learner lesson completion and progress percentage
-- Row Level Security policies for learner-owned profile and progress data
+- 32-session A2-to-B1 and telc B1 course roadmap
+- Per-learner lesson completion and progress tracking
+- Dedicated lesson pages with Listening, Reading, Writing, Speaking and Grammar & Vocabulary sections
+- German listening dialogue with browser speech playback, pause, resume, stop and sentence navigation
+- Optional English translations for learning instructions and quiz content
 - Responsive classroom interface
 
-**Current scope:** this is the authentication, dashboard and progress foundation. Full lesson explanations, interactive exercises, quizzes, answer checking and study-time analytics are planned next; they are not yet implemented.
+**Content status:** the lesson workspace is currently a prototype. It contains sample learning material reused across lesson pages; all 32 sessions do not yet have unique, complete lesson content. Writing feedback and spoken-answer assessment are not automated yet.
 
 ## Stack
 
@@ -28,8 +29,8 @@ Deutschraum is a React + Vite learning app with Supabase authentication and lear
 2. Clone the repository and install dependencies:
 
    ```bash
-   git clone https://github.com/samyuktaprabhu/deutsche-raum.git
-   cd deutsche-raum
+   git clone https://github.com/samyuktaprabhu/deutsch-raum.git
+   cd deutsch-raum
    npm install
    ```
 
@@ -50,12 +51,11 @@ Deutschraum is a React + Vite learning app with Supabase authentication and lear
 
 1. Create a Supabase project.
 2. Run [supabase/schema.sql](supabase/schema.sql) in the SQL Editor.
-3. Run [supabase/seed-lessons.sql](supabase/seed-lessons.sql) to add the 32-session course roadmap.
+3. Run [supabase/seed-lessons.sql](supabase/seed-lessons.sql) to add the course roadmap.
 4. Enable email/password authentication.
-5. For Google login, configure the Google provider credentials under Authentication → Sign In / Providers and add the Supabase callback URL in Google Cloud.
-6. Add your local and deployed site URLs to the Supabase Auth URL configuration.
+5. Add your local and deployed site URLs to the Supabase Auth URL configuration.
 
-Never put a Supabase service-role/secret key or Google OAuth client secret in the frontend or repository. Only the project URL and publishable (or legacy anon) key belong in the Vite frontend environment.
+Never put a Supabase service-role/secret key in the frontend or repository. Only the project URL and publishable (or legacy anon) key belong in the Vite frontend environment.
 
 ## Netlify deployment
 
@@ -65,26 +65,15 @@ Never put a Supabase service-role/secret key or Google OAuth client secret in th
 
 Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in Netlify's environment variables, then trigger a new deploy.
 
+Live classroom: https://deutsche-raum.netlify.app/
+
 ## Course approach
 
 1. **A2 refresh** — sentence structure, cases, prepositions and tenses.
-2. **B1 development** — 24 lessons across 8 modules, with three lessons per module, matched to the learner's own *Menschen B1* edition.
+2. **B1 development** — original topics and practical language use.
 3. **telc B1 preparation** — grammar, reading, listening, writing and speaking.
 
-A suggested 90-minute weekday session:
-
-| Activity | Time |
-|---|---:|
-| Vocabulary recall | 10 min |
-| Grammar focus | 20 min |
-| Textbook exercises | 20 min |
-| Reading or listening | 15 min |
-| Speaking or writing | 15 min |
-| Review and corrections | 10 min |
-
-## Textbook and content notice
-
-Deutschraum is an independent learning companion. It is not affiliated with or endorsed by Klett. The *Menschen B1* textbook, exercises and audio are not included; use your own licensed copy or the publisher's platform.
+Deutschraum is an independent learning companion and is not affiliated with or endorsed by the publisher of *Menschen B1*. Textbook pages, exercises and audio are not reproduced in this app.
 
 ---
 
