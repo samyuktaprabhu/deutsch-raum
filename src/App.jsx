@@ -104,6 +104,18 @@ function LessonWorkspace({ lesson, onBack, onComplete, completed }) {
     'Grammatik & Wortschatz': {intro:'Wähle die richtige Antwort. Lies danach die Erklärung und versuche, einen eigenen Beispielsatz zu bilden.'}
   }
   const [showEnglish, setShowEnglish] = useState({})
+  const questionEnglish = {
+    'Was möchte die neue Person am Wochenende machen?':'What would the new person like to do at the weekend?',
+    'Wo treffen sich die Freunde?':'Where are the friends meeting?',
+    'Was soll der Gast vielleicht mitbringen?':'What might the guest bring?',
+    'Warum ist die Person einem Sportverein beigetreten?':'Why did the person join a sports club?',
+    'Was machen die Mitglieder außer dem Training?':'What do the members do apart from training?',
+    'Was braucht eine gute Freundschaft?':'What does a good friendship need?',
+    'Ich freue mich ___ das Treffen.':'I am looking forward ___ the meeting.',
+    'Welche Satzstellung ist richtig?':'Which word order is correct?',
+    'Welche Formulierung leitet eine Meinung ein?':'Which phrase introduces an opinion?',
+    'Wir treffen ___ am Samstag.':'We are meeting ___ on Saturday.'
+  }
   const optionEnglish = {
     'Zu Hause bleiben.':'Stay at home.','Etwas mit anderen unternehmen.':'Do something with other people.','Einkaufen gehen.':'Go shopping.',
     'In einem Café.':'In a café.','Im Park.':'In the park.','Am Bahnhof.':'At the station.','Einen Kuchen.':'A cake.','Bücher.':'Books.','Einen Fußball.':'A football.',
@@ -152,7 +164,7 @@ function LessonWorkspace({ lesson, onBack, onComplete, completed }) {
         {tab==='Schreiben' && <><div className="task-box"><b>Writing task · 80–100 words</b><p>Du bist vor Kurzem in eine neue Stadt gezogen. Schreibe eine E-Mail an eine Kollegin oder einen Kollegen. Berichte, wie du dich eingelebt hast. Beschreibe, wie du neue Menschen kennenlernst, und schlage ein gemeinsames Treffen vor. Schreibe 80–100 Wörter.</p>{translationButton('writing-task',english.Schreiben.task)}</div><div className="phrase-list"><b>Useful phrases</b><p>Seit Kurzem wohne ich … · Am Anfang war es … · Inzwischen habe ich … · Hättest du Lust, …? · Ich freue mich auf deine Antwort.</p></div><label className="answer-label">Your email<textarea rows={9} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Liebe/r …"/></label><p className="word-count">{draft.trim()?draft.trim().split(/\s+/).length:0} words · Target: 80–100</p><button className="check-button" onClick={()=>setChecked(true)} disabled={!draft.trim()}>Show self-review checklist</button>{checked&&<div className="feedback-panel"><b>Review your text</b><ul>{english.Schreiben.checklist.map(item=><li key={item}>{item}</li>)}</ul><p>Automatic writing feedback is not available yet. Use this checklist to revise your text.</p></div>}</>}
         {tab==='Sprechen' && <><p>{english.Sprechen.intro}</p>{translationButton('speaking-intro',english.Sprechen.task)}<div className="task-box"><ol><li>Wie lernt man in einer neuen Stadt am besten Leute kennen?</li><li>Was ist dir bei einer Freundschaft besonders wichtig?</li><li>Erzähl of einer Situation, in der du jemanden neu kennengelernt hast.</li></ol></div><div className="phrase-list"><b>Useful phrases</b><p>Meiner Meinung nach … · Ein gutes Beispiel dafür ist … · Einerseits …, andererseits … · Ich habe die Erfahrung gemacht, dass …</p></div><label className="answer-label">Notes or voice input<textarea rows={6} value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Write or dictate your response…"/></label><small>You can use your device’s dictation feature to capture your response.</small></>}
         {tab==='Grammatik & Wortschatz' && <p>{english[tab].intro}</p>}
-        {qs.map((q,i)=><div className="question-card" key={q.q}><b>{i+1}. {q.q}</b>{translationButton('q-'+tab+i, `${q.en}\n\nAnswer choices: ${q.o.map(option=>optionEnglish[option] || option).join(' / ')}\n\nExplanation: ${q.en}`)}<div className="quiz-options">{q.o.map((o,j)=><button key={o} className={answers[tab+i]===String(j)?'selected':''} onClick={()=>setAnswers(old=>({...old,[tab+i]:String(j)}))}>{String.fromCharCode(65+j)}. {o}</button>)}</div>{checked&&<p className={answers[tab+i]===String(q.a)?'feedback-correct':'feedback-wrong'}>{answers[tab+i]===String(q.a)?'Correct! ':'Review this again: '}{q.e}</p>}</div>)}
+        {qs.map((q,i)=><div className="question-card" key={q.q}><b>{i+1}. {q.q}</b>{translationButton('q-'+tab+i, `${questionEnglish[q.q] || q.en}\n\nAnswer choices: ${q.o.map(option=>optionEnglish[option] || option).join(' / ')}\n\nExplanation: ${q.en}`)}<div className="quiz-options">{q.o.map((o,j)=><button key={o} className={answers[tab+i]===String(j)?'selected':''} onClick={()=>setAnswers(old=>({...old,[tab+i]:String(j)}))}>{String.fromCharCode(65+j)}. {o}</button>)}</div>{checked&&<p className={answers[tab+i]===String(q.a)?'feedback-correct':'feedback-wrong'}>{answers[tab+i]===String(q.a)?'Correct! ':'Review this again: '}{q.e}</p>}</div>)}
         {qs.length>0&&<div className="skill-footer"><span>{done?score+' / '+qs.length+' richtig':'Answer all questions to see your result'}</span><button className="primary" disabled={!done} onClick={()=>setChecked(true)}>Check answers</button></div>}
       </section>
       <section className="lesson-completion"><div><b>Your learning progress</b><p>Complete all four skills and the language focus, then mark the lesson as complete.</p></div><button className="primary" onClick={onComplete}>{completed?'Mark as incomplete':'Complete lesson'}</button></section>
