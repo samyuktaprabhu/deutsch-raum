@@ -58,45 +58,93 @@ function AuthScreen() {
 }
 
 function LessonWorkspace({ lesson, onBack, onComplete, completed }) {
-  const [tab, setTab] = useState('Listening')
+  const [tab, setTab] = useState('Hören')
   const [answers, setAnswers] = useState({})
   const [draft, setDraft] = useState('')
   const [notes, setNotes] = useState('')
   const [checked, setChecked] = useState(false)
   const [transcript, setTranscript] = useState(false)
-  const sections = ['Listening','Reading','Writing','Speaking','Grammar & vocabulary']
-  const listening = 'Hallo, ich bin neu in der Stadt und kenne hier noch nicht viele Leute. Am Wochenende möchte ich gern etwas unternehmen. Hast du einen Tipp? — Ja, wir treffen uns am Samstag mit Freunden im Park. Wenn du möchtest, kannst du mitkommen. — Das klingt toll! Soll ich etwas mitbringen? — Vielleicht einen kleinen Kuchen. Wir machen ein Picknick.'
+  const [translations, setTranslations] = useState({})
+  const [audioState, setAudioState] = useState('stopped')
+  const [sentenceIndex, setSentenceIndex] = useState(0)
+  const sections = ['Hören','Lesen','Schreiben','Sprechen','Grammatik & Wortschatz']
+  const listening = [
+    'Hallo, ich bin neu in der Stadt und kenne hier noch nicht viele Leute.',
+    'Am Wochenende möchte ich gern etwas unternehmen. Hast du einen Tipp?',
+    'Ja, wir treffen uns am Samstag mit Freunden im Park.',
+    'Wenn du möchtest, kannst du mitkommen.',
+    'Das klingt toll! Soll ich etwas mitbringen?',
+    'Vielleicht einen kleinen Kuchen. Wir machen ein Picknick.'
+  ]
   const reading = 'Als ich vor einem Jahr nach Freiburg gezogen bin, kannte ich dort niemanden. Am Anfang war es nicht leicht, neue Kontakte zu knüpfen. Deshalb habe ich mich in einem Sportverein angemeldet. Schon nach wenigen Wochen kannte ich viele Menschen. Besonders schön finde ich, dass wir nicht nur zusammen trainieren, sondern auch am Wochenende etwas unternehmen. Eine gute Freundschaft braucht meiner Meinung nach Zeit und gegenseitiges Vertrauen.'
   const sets = {
-    Listening: [{q:'What does the new person want to do?',o:['Stay at home','Do something with others','Go shopping'],a:1,e:'They say: Am Wochenende möchte ich gern etwas unternehmen.'},{q:'Where will they meet?',o:['At a café','In the park','At the station'],a:1,e:'They meet im Park.'},{q:'What might the guest bring?',o:['A cake','Books','A football'],a:0,e:'The suggestion is einen kleinen Kuchen.'}],
-    Reading: [{q:'Why did the writer join a sports club?',o:['To find a job','To meet people','To study grammar'],a:1,e:'The writer wanted to make new contacts.'},{q:'What do members do besides training?',o:['Meet at weekends','Travel every day','Study together'],a:0,e:'They also do activities at weekends.'},{q:'What does friendship need?',o:['Money','Time and trust','The same hobbies'],a:1,e:'The text says time and gegenseitiges Vertrauen.'}],
-    'Grammar & vocabulary': [{q:'Ich freue mich ___ das Treffen.',o:['auf','an','mit'],a:0,e:'sich freuen auf + Akkusativ.'},{q:'Choose the correct word order.',o:['Weil ich bin neu …','Weil ich neu bin …','Weil neu ich bin …'],a:1,e:'The conjugated verb goes to the end of a weil-clause.'},{q:'Which phrase introduces an opinion?',o:['Meiner Meinung nach …','Seit zwei Jahre …','Zum Beispiel gestern …'],a:0,e:'Meiner Meinung nach is a useful B1 opinion phrase.'},{q:'Wir treffen ___ am Samstag.',o:['uns','sich','euch'],a:0,e:'The reflexive pronoun for wir is uns.'}]
+    Hören: [
+      {q:'Was möchte die neue Person am Wochenende machen?',o:['Zu Hause bleiben.','Etwas mit anderen unternehmen.','Einkaufen gehen.'],a:1,e:'Die Person sagt: „Am Wochenende möchte ich gern etwas unternehmen.“',en:'The person wants to do something with other people.'},
+      {q:'Wo treffen sich die Freunde?',o:['In einem Café.','Im Park.','Am Bahnhof.'],a:1,e:'Sie treffen sich im Park.',en:'They are meeting in the park.'},
+      {q:'Was soll der Gast vielleicht mitbringen?',o:['Einen Kuchen.','Bücher.','Einen Fußball.'],a:0,e:'Vorgeschlagen wird ein kleiner Kuchen.',en:'The suggested item is a small cake.'}
+    ],
+    Lesen: [
+      {q:'Warum ist die Person einem Sportverein beigetreten?',o:['Um eine Arbeit zu finden.','Um neue Menschen kennenzulernen.','Um Grammatik zu lernen.'],a:1,e:'Die Person wollte neue Kontakte knüpfen.',en:'The writer wanted to meet people and make new connections.'},
+      {q:'Was machen die Mitglieder außer dem Training?',o:['Sie unternehmen am Wochenende etwas.','Sie reisen jeden Tag.','Sie lernen zusammen.',],a:0,e:'Sie unternehmen auch am Wochenende etwas zusammen.',en:'They also do activities together at weekends.'},
+      {q:'Was braucht eine gute Freundschaft?',o:['Geld.','Zeit und gegenseitiges Vertrauen.','Die gleichen Hobbys.'],a:1,e:'Im Text stehen Zeit und gegenseitiges Vertrauen.',en:'The text says friendship needs time and mutual trust.'}
+    ],
+    'Grammatik & Wortschatz': [
+      {q:'Ich freue mich ___ das Treffen.',o:['auf','an','mit'],a:0,e:'„Sich freuen auf“ steht mit dem Akkusativ.',en:'The expression „sich freuen auf“ takes the accusative.'},
+      {q:'Welche Satzstellung ist richtig?',o:['Weil ich bin neu, suche ich Kontakte.','Weil ich neu bin, suche ich Kontakte.','Weil neu ich bin, suche ich Kontakte.'],a:1,e:'Im weil-Satz steht das konjugierte Verb am Ende.',en:'In a weil-clause, the conjugated verb goes at the end.'},
+      {q:'Welche Formulierung leitet eine Meinung ein?',o:['Meiner Meinung nach …','Seit zwei Jahre …','Zum Beispiel gestern …'],a:0,e:'„Meiner Meinung nach“ ist eine nützliche Redewendung auf B1-Niveau.',en:'„Meiner Meinung nach“ is a useful way to introduce an opinion at B1 level.'},
+      {q:'Wir treffen ___ am Samstag.',o:['uns','sich','euch'],a:0,e:'Das Reflexivpronomen zu „wir“ lautet „uns“.',en:'The reflexive pronoun used with „wir“ is „uns“.'}
+    ]
   }
-  function play() {
+  const english = {
+    Hören: {intro:'Höre zuerst auf die Hauptaussage und danach noch einmal auf Einzelheiten. Der Dialog übt Einladungen und Verabredungen.',task:'Höre dir den Dialog an. Beantworte anschließend die Fragen.',audio:'Deutscher Dialog · Hör genau zu',play:'Abspielen',pause:'Pause',resume:'Fortsetzen',stop:'Stopp',transcript:'Transkript anzeigen',hide:'Transkript ausblenden'},
+    Lesen: {intro:'Lies den Text zuerst, um die Hauptaussage zu verstehen. Lies ihn danach noch einmal und achte auf Gründe und Einzelheiten.',task:'Lies den Text und beantworte anschließend die Fragen.'},
+    Schreiben: {task:'Du bist vor Kurzem in eine neue Stadt gezogen. Schreibe eine E-Mail an eine Kollegin oder einen Kollegen. Berichte, wie du dich eingelebt hast. Beschreibe, wie du neue Menschen kennenlernst, und schlage ein gemeinsames Treffen vor. Schreibe 80–100 Wörter.',label:'Deine E-Mail',review:'Überprüfe deinen Text',checklist:['Hast du alle drei Aufgabenpunkte beantwortet?','Hast du eine passende Anrede und einen höflichen Schluss verwendet?','Hast du deine Ideen mit weil, deshalb, aber oder außerdem verbunden?','Hast du die Verbposition und die Großschreibung der Nomen überprüft?']},
+    Sprechen: {intro:'Sprich 1–2 Minuten zu jeder Frage. Begründe deine Meinung und nenne Beispiele, statt nur kurz zu antworten.',task:'Beantworte die Fragen laut.'},
+    'Grammatik & Wortschatz': {intro:'Wähle die richtige Antwort. Lies danach die Erklärung und versuche, einen eigenen Beispielsatz zu bilden.'}
+  }
+  const [showEnglish, setShowEnglish] = useState({})
+  function translationButton(key, text) {
+    return <div className="translation-control"><button type="button" className="text-button" onClick={()=>setShowEnglish(old=>({...old,[key]:!old[key]}))}>{showEnglish[key]?'Englische Übersetzung ausblenden':'Auf Englisch übersetzen'}</button>{showEnglish[key]&&<p className="translation-text">{text}</p>}</div>
+  }
+  function speakFrom(index) {
     if (!window.speechSynthesis) return
     window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(listening); u.lang = 'de-DE'; u.rate = 0.88
-    window.speechSynthesis.speak(u)
+    const utterance = new SpeechSynthesisUtterance(listening[index])
+    utterance.lang = 'de-DE'; utterance.rate = 0.88
+    utterance.onend = () => {
+      if (index < listening.length - 1) speakFrom(index + 1)
+      else setAudioState('stopped')
+    }
+    utterance.onerror = () => setAudioState('stopped')
+    setSentenceIndex(index)
+    setAudioState('playing')
+    window.speechSynthesis.speak(utterance)
   }
+  function pauseAudio() { if (window.speechSynthesis?.speaking) { window.speechSynthesis.pause(); setAudioState('paused') } }
+  function resumeAudio() { if (window.speechSynthesis?.paused) { window.speechSynthesis.resume(); setAudioState('playing') } }
+  function stopAudio() { window.speechSynthesis?.cancel(); setAudioState('stopped') }
+  function seekAudio(value) { const index=Number(value); speakFrom(index) }
+  useEffect(()=>()=>window.speechSynthesis?.cancel(),[])
   const qs = sets[tab] || []
   const score = qs.filter((q,i)=>answers[tab+i]===String(q.a)).length
   const done = qs.every((q,i)=>answers[tab+i]!==undefined)
   return <div className="app-shell lesson-page">
-    <header className="topbar"><a className="brand" href="/">deutsch<span>raum</span></a><span>{lesson.level} · Session {lesson.sequence_no}</span></header>
+    <header className="topbar"><a className="brand" href="/">deutsch<span>raum</span></a><span>{lesson.level} · Einheit {lesson.sequence_no}</span></header>
     <main className="dashboard lesson-page-content">
-      <button className="text-button back-link" onClick={onBack}>← Back to course roadmap</button>
-      <section className="lesson-hero"><p className="eyebrow">DEUTSCHRAUM · {lesson.level} · SESSION {lesson.sequence_no}</p><h1>{lesson.sequence_no===1?'Sentence structure':lesson.title}</h1><p>{lesson.summary}</p><div className="lesson-meta"><span>90-minute learning plan</span><span>4 language skills + language focus</span></div></section>
+      <button className="text-button back-link" onClick={onBack}>← Zurück zum Kursplan</button>
+      <section className="lesson-hero"><p className="eyebrow">DEUTSCHRAUM · {lesson.level} · EINHEIT {lesson.sequence_no}</p><h1>{lesson.sequence_no===1?'Satzbau':lesson.title}</h1><p>{lesson.summary}</p><div className="lesson-meta"><span>90-Minuten-Lerneinheit</span><span>Vier Fertigkeiten + Sprachtraining</span></div></section>
       <nav className="skill-nav">{sections.map(x=><button key={x} className={tab===x?'active':''} onClick={()=>{setTab(x);setChecked(false)}}>{x}</button>)}</nav>
-      <section className="skill-card"><div className="skill-heading"><div><p className="eyebrow">YOUR PRACTICE</p><h2>{tab}</h2></div><span className="time-chip">{tab==='Writing'?'25 min':tab==='Speaking'?'20 min':'15 min'}</span></div>
-        {tab==='Listening' && <><p>Listen once for the main idea, then again for details. This original dialogue practises invitations and making social plans.</p><div className="audio-card"><b>German conversation · Listen carefully</b><button className="primary" onClick={play}>▶ Play German audio</button><small>Audio is spoken by your browser's German text-to-speech voice.</small></div><button className="text-button" onClick={()=>setTranscript(!transcript)}>{transcript?'Hide transcript':'Reveal transcript after listening'}</button>{transcript&&<blockquote className="transcript">{listening}</blockquote>}</>}
-        {tab==='Reading' && <><p>Read the text once for the main idea. Read again and look for reasons and details.</p><article className="reading-passage">{reading}</article><small>Original Deutschraum reading text · B1</small></>}
-        {tab==='Writing' && <><div className="task-box"><b>Writing task · 80–100 words</b><p>You have recently moved to a new city. Write an email to a colleague. Explain how you are settling in, describe one way you are meeting new people, and suggest doing something together.</p></div><div className="phrase-list"><b>Useful expressions</b><p>Seit Kurzem wohne ich … · Am Anfang war es … · Inzwischen habe ich … · Hättest du Lust, …? · Ich freue mich auf deine Antwort.</p></div><label className="answer-label">Your email<textarea rows={9} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Liebe/r …"/></label><p className="word-count">{draft.trim()?draft.trim().split(/\s+/).length:0} words · Target: 80–100</p><button className="check-button" onClick={()=>setChecked(true)} disabled={!draft.trim()}>Show self-review checklist</button>{checked&&<div className="feedback-panel"><b>Review your writing</b><ul><li>Did you answer all three parts?</li><li>Did you use a greeting and polite ending?</li><li>Did you connect ideas with weil, deshalb, aber or außerdem?</li><li>Did you check verb position and noun capitalisation?</li></ul><p>Automated correction is not connected yet; use this checklist to review your draft.</p></div>}</>}
-        {tab==='Speaking' && <><p>Speak for 1–2 minutes per prompt. Give reasons and examples, not just short answers.</p><div className="task-box"><ol><li>Wie lernt man in einer neuen Stadt am besten Leute kennen?</li><li>Was ist dir bei einer Freundschaft besonders wichtig?</li><li>Erzähl von einer Situation, in der du jemanden neu kennengelernt hast.</li></ol></div><div className="phrase-list"><b>Useful speaking phrases</b><p>Meiner Meinung nach … · Ein gutes Beispiel dafür ist … · Einerseits …, andererseits … · Ich habe die Erfahrung gemacht, dass …</p></div><label className="answer-label">Speaking notes or speech-to-text<textarea rows={6} value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Write or dictate what you said …"/></label><small>Use your device's dictation to capture your spoken response.</small></>}
-        {qs.map((q,i)=><div className="question-card" key={q.q}><b>{i+1}. {q.q}</b><div className="quiz-options">{q.o.map((o,j)=><button key={o} className={answers[tab+i]===String(j)?'selected':''} onClick={()=>setAnswers(old=>({...old,[tab+i]:String(j)}))}>{String.fromCharCode(65+j)}. {o}</button>)}</div>{checked&&<p className={answers[tab+i]===String(q.a)?'feedback-correct':'feedback-wrong'}>{answers[tab+i]===String(q.a)?'Correct. ':'Review: '}{q.e}</p>}</div>)}
-        {qs.length>0&&<div className="skill-footer"><span>{done?score+' / '+qs.length+' correct':'Answer all questions to check your result'}</span><button className="primary" disabled={!done} onClick={()=>setChecked(true)}>Check answers</button></div>}
+      <section className="skill-card"><div className="skill-heading"><div><p className="eyebrow">DEINE ÜBUNGEN</p><h2>{tab}</h2></div><span className="time-chip">{tab==='Schreiben'?'25 Min.':tab==='Sprechen'?'20 Min.':'15 Min.'}</span></div>
+        {tab==='Hören' && <><p>{english.Hören.intro}</p>{translationButton('listen-intro',english.Hören.task)}<div className="audio-card"><b>{english.Hören.audio}</b><div className="audio-controls"><button className="primary" onClick={()=>speakFrom(0)} disabled={audioState==='playing'}>▶ {english.Hören.play}</button><button className="check-button" onClick={pauseAudio} disabled={audioState!=='playing'}>Ⅱ {english.Hören.pause}</button><button className="check-button" onClick={resumeAudio} disabled={audioState!=='paused'}>↻ {english.Hören.resume}</button><button className="check-button" onClick={stopAudio}>■ {english.Hören.stop}</button></div><label className="seek-control">Satz auswählen und abspielen <input type="range" min="0" max={listening.length-1} value={sentenceIndex} onChange={e=>seekAudio(e.target.value)} /><small>Satz {sentenceIndex+1} von {listening.length} · Du kannst direkt zu einem Satz springen.</small></label><small>Die Wiedergabe nutzt die deutsche Sprachsynthese deines Browsers. Du kannst pausieren, fortsetzen, stoppen oder ab einem beliebigen Satz starten.</small></div><button className="text-button" onClick={()=>setTranscript(!transcript)}>{transcript?'Transkript ausblenden':'Transkript nach dem Hören anzeigen'}</button>{transcript&&<blockquote className="transcript">{listening.join(' ')}</blockquote>}</>}
+        {tab==='Lesen' && <><p>{english.Lesen.intro}</p>{translationButton('reading-intro',english.Lesen.task)}<article className="reading-passage">{reading}</article><small>Originaler Lesetext von Deutschraum · B1</small></>}
+        {tab==='Schreiben' && <><div className="task-box"><b>Schreibaufgabe · 80–100 Wörter</b><p>Du bist vor Kurzem in eine neue Stadt gezogen. Schreibe eine E-Mail an eine Kollegin oder einen Kollegen. Berichte, wie du dich eingelebt hast. Beschreibe, wie du neue Menschen kennenlernst, und schlage ein gemeinsames Treffen vor. Schreibe 80–100 Wörter.</p>{translationButton('writing-task',english.Schreiben.task)}</div><div className="phrase-list"><b>Nützliche Redemittel</b><p>Seit Kurzem wohne ich … · Am Anfang war es … · Inzwischen habe ich … · Hättest du Lust, …? · Ich freue mich auf deine Antwort.</p></div><label className="answer-label">Deine E-Mail<textarea rows={9} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Liebe/r …"/></label><p className="word-count">{draft.trim()?draft.trim().split(/\s+/).length:0} Wörter · Ziel: 80–100</p><button className="check-button" onClick={()=>setChecked(true)} disabled={!draft.trim()}>Checkliste zur Selbstkontrolle anzeigen</button>{checked&&<div className="feedback-panel"><b>Überprüfe deinen Text</b><ul>{english.Schreiben.checklist.map(item=><li key={item}>{item}</li>)}</ul><p>Eine automatische Textkorrektur ist noch nicht verfügbar. Nutze diese Checkliste zur Überarbeitung.</p></div>}</>}
+        {tab==='Sprechen' && <><p>{english.Sprechen.intro}</p>{translationButton('speaking-intro',english.Sprechen.task)}<div className="task-box"><ol><li>Wie lernt man in einer neuen Stadt am besten Leute kennen?</li><li>Was ist dir bei einer Freundschaft besonders wichtig?</li><li>Erzähl von einer Situation, in der du jemanden neu kennengelernt hast.</li></ol></div><div className="phrase-list"><b>Nützliche Redemittel</b><p>Meiner Meinung nach … · Ein gutes Beispiel dafür ist … · Einerseits …, andererseits … · Ich habe die Erfahrung gemacht, dass …</p></div><label className="answer-label">Notizen oder Spracheingabe<textarea rows={6} value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Schreibe oder diktiere deine Antwort …"/></label><small>Du kannst die Diktierfunktion deines Geräts verwenden, um deine Antwort festzuhalten.</small></>}
+        {tab==='Grammatik & Wortschatz' && <p>{english[tab].intro}</p>}
+        {qs.map((q,i)=><div className="question-card" key={q.q}><b>{i+1}. {q.q}</b>{translationButton('q-'+tab+i,q.en)}<div className="quiz-options">{q.o.map((o,j)=><button key={o} className={answers[tab+i]===String(j)?'selected':''} onClick={()=>setAnswers(old=>({...old,[tab+i]:String(j)}))}>{String.fromCharCode(65+j)}. {o}</button>)}</div>{checked&&<p className={answers[tab+i]===String(q.a)?'feedback-correct':'feedback-wrong'}>{answers[tab+i]===String(q.a)?'Richtig! ':'Noch einmal ansehen: '}{q.e}</p>}</div>)}
+        {qs.length>0&&<div className="skill-footer"><span>{done?score+' / '+qs.length+' richtig':'Beantworte alle Fragen, um dein Ergebnis zu sehen'}</span><button className="primary" disabled={!done} onClick={()=>setChecked(true)}>Antworten überprüfen</button></div>}
       </section>
-      <section className="lesson-completion"><div><b>Lesson progress</b><p>Complete all four skills and the language focus, then mark this session complete.</p></div><button className="primary" onClick={onComplete}>{completed?'Mark in progress':'Mark lesson complete'}</button></section>
-      <p className="footer">Original Deutschraum learning material · Independent learning companion.</p>
+      <section className="lesson-completion"><div><b>Dein Lernfortschritt</b><p>Bearbeite alle vier Fertigkeiten und den Sprachfokus. Markiere danach die Einheit als abgeschlossen.</p></div><button className="primary" onClick={onComplete}>{completed?'Als offen markieren':'Einheit abschließen'}</button></section>
+      <p className="footer">Originales Lernmaterial von Deutschraum · Unabhängige Lernplattform.</p>
     </main>
   </div>
 }
