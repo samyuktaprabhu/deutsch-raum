@@ -2,7 +2,7 @@
 
 **Your personal German-learning classroom — from A2 refresh to B1 confidence.**
 
-Deutschraum is a React + Vite learning app with Supabase authentication and learner-specific progress tracking. The initial roadmap is designed around *Netzwerk neu B1* and telc B1 preparation.
+Deutschraum is a React + Vite learning app with Supabase authentication and learner-specific progress tracking. The initial roadmap is designed around *Menschen B1* and telc B1 preparation.
 
 ## Current features
 
@@ -68,7 +68,7 @@ Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in Netlify's environ
 ## Course approach
 
 1. **A2 refresh** — sentence structure, cases, prepositions and tenses.
-2. **B1 development** — 12 chapters, with two sessions per chapter, matched to the learner's own *Netzwerk neu B1* edition.
+2. **B1 development** — 24 lessons across 8 modules, with three lessons per module, matched to the learner's own *Menschen B1* edition.
 3. **telc B1 preparation** — grammar, reading, listening, writing and speaking.
 
 A suggested 90-minute weekday session:
@@ -84,7 +84,7 @@ A suggested 90-minute weekday session:
 
 ## Textbook and content notice
 
-Deutschraum is an independent learning companion. It is not affiliated with or endorsed by Klett. The *Netzwerk neu B1* textbook, exercises and audio are not included; use your own licensed copy or the publisher's platform.
+Deutschraum is an independent learning companion. It is not affiliated with or endorsed by Klett. The *Menschen B1* textbook, exercises and audio are not included; use your own licensed copy or the publisher's platform.
 
 ---
 
