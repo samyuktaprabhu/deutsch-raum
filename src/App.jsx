@@ -114,7 +114,7 @@ function Dashboard({ session }) {
       <section className="welcome"><div><p className="eyebrow">DEIN LERNRAUM · YOUR LEARNING SPACE</p><h1>Make room for <em>German.</em></h1><p className="muted">Your path from A2 revision to B1 confidence and telc preparation.</p></div>
         <div className="progress-card"><span className="eyebrow">COURSE PROGRESS</span><strong>{percent}%</strong><div className="progress-track"><i style={{width:percent+'%'}} /></div><small>{completedIds.size} of {lessons.length} lessons completed</small></div>
       </section>
-      <section className="course-heading"><div><p className="eyebrow">YOUR COURSE</p><h2>{course?.title || 'A2 Refresh to B1 · telc Preparation'}</h2><p className="muted">Weekday evenings · 19:00–20:30 CET · Netzwerk neu B1</p></div></section>
+      <section className="course-heading"><div><p className="eyebrow">YOUR COURSE</p><h2>{course?.title || 'A2 Refresh to B1 · telc Preparation'}</h2><p className="muted">Weekday evenings · 19:00–20:30 CET · Menschen B1</p></div></section>
       {error && <p className="notice">{error}</p>}
       {loading ? <p className="muted">Loading your classroom…</p> : lessons.length===0 ? <section className="empty-card"><h3>Your classroom is being prepared.</h3><p>The account and course database are connected. Lesson sessions will appear here once the course content has been added.</p></section> :
         <section className="lesson-panel"><div className="panel-head"><h3>Course roadmap</h3><div className="filters">{['all','A2','B1','completed'].map(f=><button key={f} className={filter===f?'active':''} onClick={()=>setFilter(f)}>{f==='all'?'All':f==='completed'?'Completed':f}</button>)}</div></div>
