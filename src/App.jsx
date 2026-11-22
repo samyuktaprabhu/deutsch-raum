@@ -79,7 +79,7 @@ function Dashboard({ session }) {
   }, [])
 
   useEffect(() => {
-    const match = routePath.match(/^\\/lesson\\/([^/]+)\\/?$/)
+    const match = routePath.match(/^\/lesson\/([^/]+)\/?$/)
     if (match && lessons.length) {
       const found = lessons.find(item => item.id === match[1])
       if (found) setOpenLesson(found)
